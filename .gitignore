@@ -132,6 +132,8 @@ dmypy.json
 models/*
 data/*
 runs/*
+pretrained/*
+result/*
 
 # torch hipify generated files
 *_hip.*
