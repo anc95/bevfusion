@@ -1,5 +1,10 @@
 """
+# segmentation
 torchpack dist-run -np 1 python tools/visualize-single-lidar.py configs/nuscenes/seg/lidar-centerpoint-bev128.yaml /home/chao/code/exp-bev-fusion/data/at128/lidar/000030.bin --mode pred --checkpoint ../data/pretrained/lidar-only-seg.pth
+
+# detection
+torchpack dist-run -np 1 python tools/visualize-single-lidar.py configs/nuscenes/det/transfusion/secfpn/lidar/voxelnet_0p075.yaml /home/chao/code/exp-be
+v-fusion/data/at128/lidar/000000.bin --mode pred --checkpoint ../data/pretrained/lidar-only-det.pth
 """
 
 import argparse
