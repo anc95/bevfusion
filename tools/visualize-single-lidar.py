@@ -15,7 +15,7 @@ import mmcv
 import numpy as np
 import torch
 from mmcv import Config
-from mmcv.parallel import MMDistributedDataParallel, DataContainer
+from mmcv.parallel import MMDataParallel, DataContainer
 from mmcv.runner import load_checkpoint
 from torchpack import distributed as dist
 from torchpack.utils.config import configs
@@ -87,10 +87,9 @@ def main() -> None:
         model = build_model(cfg.model)
         load_checkpoint(model, args.checkpoint, map_location="cpu")
 
-        model = MMDistributedDataParallel(
+        model = MMDataParallel(
             model.cuda(),
-            device_ids=[torch.cuda.current_device()],
-            broadcast_buffers=False,
+            device_ids=[torch.cuda.current_device()]
         )
         model.eval()
 

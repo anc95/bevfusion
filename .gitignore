@@ -138,3 +138,5 @@ result/*
 # torch hipify generated files
 *_hip.*
 *.hip
+
+viz/**/*
