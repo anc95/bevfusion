@@ -27,6 +27,10 @@ from mmdet3d.core.utils import visualize_camera, visualize_lidar, visualize_map
 from mmdet3d.datasets import build_dataloader, build_dataset
 from mmdet3d.models import build_model
 
+# import debugpy
+# debugpy.listen(5678)
+# debugpy.wait_for_client()
+
 
 def recursive_eval(obj, globals=None):
     if globals is None:
