@@ -96,7 +96,7 @@ class BEVFusion(Base3DFusionModel):
         self.use_depth_loss = ((encoders.get('camera', {}) or {}).get('vtransform', {}) or {}).get('type', '') in ['BEVDepth', 'AwareBEVDepth', 'DBEVDepth', 'AwareDBEVDepth']
 
 
-        self.init_weights()
+        # self.init_weights()
 
     def init_weights(self) -> None:
         if "camera" in self.encoders:
