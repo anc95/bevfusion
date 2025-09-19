@@ -242,26 +242,26 @@ test_pipeline:
   -
     type: DefaultFormatBundle3D
     classes: ${object_classes}
-  # -
-  #   type: Collect3D
-  #   keys:
-  #     - img
-  #     - points
-  #     - gt_bboxes_3d
-  #     - gt_labels_3d
-  #     - gt_masks_bev
-  #   meta_keys:
-  #     - camera_intrinsics
-  #     - camera2ego
-  #     - lidar2ego
-  #     - lidar2camera
-  #     - camera2lidar
-  #     - lidar2image
-  #     - img_aug_matrix
-  #     - lidar_aug_matrix
-  # -
-  #   type: GTDepth
-  #   keyframe_only: true 
+  -
+    type: Collect3D
+    keys:
+      - img
+      - points
+      # - gt_bboxes_3d
+      # - gt_labels_3d
+      # - gt_masks_bev
+    meta_keys:
+      - camera_intrinsics
+      - camera2ego
+      - lidar2ego
+      - lidar2camera
+      - camera2lidar
+      - lidar2image
+      - img_aug_matrix
+      - lidar_aug_matrix
+  -
+    type: GTDepth
+    keyframe_only: true 
 
 data:
   samples_per_gpu: 4

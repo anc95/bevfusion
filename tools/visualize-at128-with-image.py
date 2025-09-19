@@ -1,5 +1,5 @@
 """
-torchpack dist-run -np 1 python tools/visualize-at128-with-image.py configs/nuscenes/seg/fusion-bev256d2-lss.yaml --mode pred --checkpoint pretrained/bevfusion-seg.pth
+torchpack dist-run -np 1 python tools/visualize-at128-with-image.py configs/nuscenes/seg/fusion-bev256d2-lss.yaml --mode pred --checkpoint pretrained/bevfusion-seg.pth --lidar-path /home/chao/code/exp-bev-fusion/data/at128/points/000000.bin --image-path /home/chao/code/exp-bev-fusion/data/at128/images/images_0/000000.jpg
 """
 
 import argparse
@@ -55,14 +55,14 @@ def prepare_data(dataset, lidar_path, image_path):
         [-0.0215808,  0.999263,   0.0317376, -0.00363188],
         [ 0.999683,   0.0219808, -0.0123072,  0.141231],
         [ 0,          0,          0,          1]
-    ])
+    ], dtype=np.float32)
 
     camera_intrinsics = np.array([
         [1.23569864e+03, 0.00000000e+00, 2.01395301e+03, 0.00000000e+00],
         [0.00000000e+00, 1.23578552e+03, 1.51927919e+03, 0.00000000e+00],
         [0.00000000e+00, 0.00000000e+00, 1.00000000e+00, 0.00000000e+00],
         [0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 1.00000000e+00]
-    ])
+    ], dtype=np.float32)
 
     lidar2image = camera_intrinsics @ lidar2camera
 
@@ -72,8 +72,8 @@ def prepare_data(dataset, lidar_path, image_path):
         "lidar_path": lidar_path,
         "image_paths": [image_path],
         "timestamp": 1530000000000000,
-        "ego2global": np.eye(4),
-        "lidar2ego": np.eye(4),
+        "ego2global": [np.eye(4)],
+        "lidar2ego": [np.eye(4)],
         "lidar2camera": [lidar2camera],
         "lidar2image": [lidar2image],
         "camera2ego": [np.linalg.inv(lidar2camera)],
@@ -94,6 +94,18 @@ def prepare_data(dataset, lidar_path, image_path):
 
     dataset.pre_pipeline(input_dict)
     example = dataset.pipeline(input_dict)
+
+    example["points"] = DataContainer([[example["points"].data]])
+    example["img"] = DataContainer([example["img"].data.unsqueeze(0)])
+    example["img_aug_matrix"] = DataContainer([example["img_aug_matrix"].data.unsqueeze(0)])
+    example["lidar_aug_matrix"] = DataContainer([example["lidar_aug_matrix"].data.unsqueeze(0)])
+    example["camera_intrinsics"] = DataContainer([example["camera_intrinsics"].data.unsqueeze(0)])
+    example["camera2lidar"] = DataContainer([example["camera2lidar"].data.unsqueeze(0)])
+    example["lidar2image"] = DataContainer([example["lidar2image"].data.unsqueeze(0)])
+    example["lidar2camera"] = DataContainer([example["lidar2camera"].data.unsqueeze(0)])
+    example["camera2ego"] = DataContainer([example["camera2ego"].data.unsqueeze(0)])
+    example["lidar2ego"] = DataContainer([example["lidar2ego"].data.unsqueeze(0)])
+    # example["ego2global"] = DataContainer([example["ego2global"].data.unsqueeze(1)])
     return example
 
 
@@ -144,12 +156,13 @@ def main() -> None:
         model.eval()
 
     data = prepare_data(dataset, args.lidar_path, args.image_path)
-    metas = data["metas"]
+    # data = list(dataflow)[0]
+    metas = data["metas"].data
     name = "{}-{}".format(metas["timestamp"], metas["token"])
 
     if args.mode == "pred":
         with torch.inference_mode():
-            outputs = model(**data, depths=None)
+            outputs = model(**data)
 
     if args.mode == "gt" and "gt_bboxes_3d" in data:
         bboxes = data["gt_bboxes_3d"].data[0][0].tensor.numpy()
