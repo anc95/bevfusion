@@ -1,5 +1,7 @@
 """
 torchpack dist-run -np 1 python tools/visualize-at128-with-image.py configs/nuscenes/seg/fusion-bev256d2-lss.yaml --mode pred --checkpoint pretrained/bevfusion-seg.pth --lidar-path /home/chao/code/exp-bev-fusion/data/at128/points/000000.bin --image-path /home/chao/code/exp-bev-fusion/data/at128/images/images_0/000000.jpg
+
+torchpack dist-run -np 1 python tools/visualize-at128-with-image.py configs/nuscenes/det/transfusion/secfpn/camera+lidar/swint_v0p075/convfuser.yaml --mode pred --checkpoint pretrained/bevfusion-det.pth --lidar-path /home/chao/code/exp-bev-fusion/data/at128/points/000000.bin --image-path /home/chao/code/exp-bev-fusion/data/at128/images/images_0/000000.jpg
 """
 
 import argparse
@@ -22,9 +24,9 @@ from mmdet3d.core.utils import visualize_camera, visualize_lidar, visualize_map
 from mmdet3d.datasets import build_dataloader, build_dataset
 from mmdet3d.models import build_model
 
-import debugpy
-debugpy.listen(5678)
-debugpy.wait_for_client()
+# import debugpy
+# debugpy.listen(5678)
+# debugpy.wait_for_client()
 
 def isolate_single_image(batch_tensor, keep_index=0):
     assert batch_tensor.shape[1] == 6
@@ -81,7 +83,7 @@ def prepare_data(dataset, lidar_path, image_path):
         "camera_intrinsics": [camera_intrinsics],
         "sweeps": [],
         "location": "beijing",
-        "metas": {
+        "metas": [{
             "filename": [image_path],
             "timestamp": 1530000000000000,
             "token": "000000",
@@ -89,7 +91,7 @@ def prepare_data(dataset, lidar_path, image_path):
             "lidar2image": [lidar2image],
             "lidar2camera": [lidar2camera],
             "camera2ego": [np.linalg.inv(lidar2camera)],
-        }
+        }]
     }
 
     dataset.pre_pipeline(input_dict)
@@ -105,7 +107,7 @@ def prepare_data(dataset, lidar_path, image_path):
     example["lidar2camera"] = DataContainer([example["lidar2camera"].data.unsqueeze(0)])
     example["camera2ego"] = DataContainer([example["camera2ego"].data.unsqueeze(0)])
     example["lidar2ego"] = DataContainer([example["lidar2ego"].data.unsqueeze(0)])
-    # example["ego2global"] = DataContainer([example["ego2global"].data.unsqueeze(1)])
+    example["metas"] = DataContainer([[example["metas"].data]], cpu_only=True)
     return example
 
 
@@ -156,8 +158,8 @@ def main() -> None:
         model.eval()
 
     data = prepare_data(dataset, args.lidar_path, args.image_path)
-    # data = list(dataflow)[0]
-    metas = data["metas"].data
+    # data1 = list(dataflow)[0]
+    metas = data["metas"].data[0][0]
     name = "{}-{}".format(metas["timestamp"], metas["token"])
 
     if args.mode == "pred":

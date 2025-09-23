@@ -184,11 +184,11 @@ test_pipeline:
   #   compensate_velocity: ${radar_compensate_velocity}
   #   filtering: ${radar_filtering}
   #   normalize: ${radar_normalize}
-  -
-    type: LoadAnnotations3D
-    with_bbox_3d: true
-    with_label_3d: true
-    with_attr_label: False
+  # -
+  #   type: LoadAnnotations3D
+  #   with_bbox_3d: true
+  #   with_label_3d: true
+  #   with_attr_label: False
   -
     type: ImageAug3D
     final_dim: ${image_size}
@@ -219,8 +219,8 @@ test_pipeline:
       - img
       - points
       # - radar
-      - gt_bboxes_3d
-      - gt_labels_3d
+      # - gt_bboxes_3d
+      # - gt_labels_3d
       #- gt_masks_bev
     meta_keys:
       - camera_intrinsics
