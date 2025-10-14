@@ -95,6 +95,18 @@ def main() -> None:
 
     pc = np.fromfile(args.pc_path, dtype=np.float32).reshape(-1, 5)
     pc[:, 4] = 0
+    # pc[:, 0] -= 50
+    # # pc = pc[(pc[:, 0] >= -50) & (pc[:, 0] <= 50) & 
+    # #            (pc[:, 1] >= -50) & (pc[:, 1] <= 50)]
+    # theta = np.radians(90)
+    # rotation_matrix = np.array([
+    #     [np.cos(theta), -np.sin(theta), 0],
+    #     [np.sin(theta),  np.cos(theta), 0],
+    #     [0,              0,             1]
+    # ])
+    # xyz = pc[:, :3]
+    # rotated_xyz = xyz @ rotation_matrix.T
+    # pc = np.hstack((rotated_xyz, pc[:, 3:])).astype(np.float32)
     
     data = list(dataflow)[0]
     data['points'] = DataContainer([[torch.from_numpy(pc)]], stack=True)
